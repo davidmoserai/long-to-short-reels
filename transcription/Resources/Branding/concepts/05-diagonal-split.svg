@@ -1,0 +1,26 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="squircle">
+      <rect x="0" y="0" width="1024" height="1024" rx="228"/>
+    </clipPath>
+    <linearGradient id="darkhalf" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2C2C34"/>
+      <stop offset="100%" stop-color="#16161B"/>
+    </linearGradient>
+    <linearGradient id="vividhalf" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF4D6D"/>
+      <stop offset="100%" stop-color="#7B2FF7"/>
+    </linearGradient>
+  </defs>
+
+  <g clip-path="url(#squircle)">
+    <rect x="0" y="0" width="1024" height="1024" fill="url(#darkhalf)"/>
+    <polygon points="1024,0 1024,1024 0,1024" fill="url(#vividhalf)"/>
+
+    <rect x="140" y="160" width="280" height="24" rx="12" fill="#FFFFFF" opacity="0.55"/>
+    <rect x="140" y="216" width="200" height="24" rx="12" fill="#FFFFFF" opacity="0.35"/>
+    <rect x="140" y="272" width="240" height="24" rx="12" fill="#FFFFFF" opacity="0.45"/>
+
+    <path d="M 700 660 L 700 820 L 840 740 Z" fill="#FFFFFF"/>
+  </g>
+</svg>

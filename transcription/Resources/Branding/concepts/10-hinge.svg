@@ -4,7 +4,7 @@
       <stop offset="0%" stop-color="#26262E"/>
       <stop offset="100%" stop-color="#0C0C10"/>
     </linearGradient>
-    <linearGradient id="inner" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="panel" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#FF4D6D"/>
       <stop offset="100%" stop-color="#7B2FF7"/>
     </linearGradient>
@@ -12,9 +12,14 @@
 
   <rect x="0" y="0" width="1024" height="1024" rx="228" fill="url(#bg)"/>
 
-  <rect x="140" y="300" width="744" height="424" rx="56" fill="none" stroke="#4A4A54" stroke-width="14"/>
-  <rect x="252" y="256" width="520" height="512" rx="64" fill="none" stroke="#6E6E7A" stroke-width="16"/>
-  <rect x="372" y="212" width="280" height="600" rx="72" fill="url(#inner)"/>
+  <rect x="150" y="330" width="380" height="364" rx="36" fill="#3E3E48"/>
+  <rect x="560" y="200" width="310" height="624" rx="52" fill="url(#panel)"/>
 
-  <path d="M 442 424 L 442 600 L 582 512 Z" fill="#FFFFFF"/>
+  <g fill="#0C0C10">
+    <circle cx="545" cy="360" r="12"/>
+    <circle cx="545" cy="512" r="12"/>
+    <circle cx="545" cy="664" r="12"/>
+  </g>
+
+  <path d="M 668 436 L 668 588 L 792 512 Z" fill="#FFFFFF"/>
 </svg>

@@ -1,0 +1,27 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#26262E"/>
+      <stop offset="100%" stop-color="#0C0C10"/>
+    </linearGradient>
+    <linearGradient id="flap" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7B2FF7"/>
+      <stop offset="100%" stop-color="#FF4D6D"/>
+    </linearGradient>
+    <linearGradient id="crease" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1024" height="1024" rx="228" fill="url(#bg)"/>
+
+  <rect x="160" y="248" width="560" height="220" rx="32" fill="#3E3E48"/>
+
+  <g transform="skewX(-8)">
+    <rect x="330" y="420" width="330" height="430" rx="44" fill="url(#flap)"/>
+  </g>
+  <rect x="300" y="420" width="420" height="46" fill="url(#crease)"/>
+
+  <path d="M 470 604 L 470 748 L 596 676 Z" fill="#FFFFFF"/>
+</svg>
