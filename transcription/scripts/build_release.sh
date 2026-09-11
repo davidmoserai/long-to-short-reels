@@ -23,6 +23,10 @@ cp ".build/release/$APP_NAME" "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
 cp "Resources/AppBundle/Info.plist" "$APP_BUNDLE/Contents/Info.plist"
 cp "Resources/Branding/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/AppIcon.icns"
 
+# Stamp a fresh build number every release so Finder/Dock/Stage Manager
+# drop their cached bundle icon instead of reusing a stale generic one.
+/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $(date +%Y%m%d%H%M)" "$APP_BUNDLE/Contents/Info.plist"
+
 # Copy any SPM resource bundles (e.g. FluidAudio's model config bundle) so
 # Bundle.module resolution still works once wrapped in a proper .app.
 for bundle in .build/release/*.bundle; do
