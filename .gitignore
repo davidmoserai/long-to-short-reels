@@ -17,3 +17,4 @@ pipeline/.venv/
 
 # Debug scratch (per-window transcript dumps from manual scoring pass)
 pipeline/window_texts/
+transcription/dist/
