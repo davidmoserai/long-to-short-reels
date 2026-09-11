@@ -65,13 +65,14 @@ public enum ClaudeScorer {
     ) async throws -> [RawCandidate] {
         var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
+        request.timeoutInterval = 120
         request.setValue("application/json", forHTTPHeaderField: "content-type")
         request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
         request.setValue(anthropicVersion, forHTTPHeaderField: "anthropic-version")
 
         let body: [String: Any] = [
             "model": model,
-            "max_tokens": 4096,
+            "max_tokens": 8192,
             "system": [
                 [
                     "type": "text",
@@ -178,7 +179,10 @@ public enum ClaudeScorer {
 
     private static let rubricPrompt = """
         You are finding short-form clip candidates in a transcript window from a long \
-        podcast/debate video, for turning into vertical Reels/Shorts/TikToks.
+        podcast/debate video, for turning into vertical Reels/Shorts/TikToks (YouTube \
+        Shorts, Instagram Reels, TikTok). This transcript window is one overlapping slice \
+        of a much longer episode -- treat it as a self-contained excerpt and don't worry \
+        about what came before or after it in the full episode.
 
         For each candidate moment you find, propose it as a JSON object with:
         - quoteStart: the first ~6-10 words of the moment, copied VERBATIM from the transcript
@@ -189,32 +193,64 @@ public enum ClaudeScorer {
         - reasoning: one sentence explaining the score
 
         Do NOT invent timestamps. Do NOT paraphrase the quotes -- they must be exact \
-        substrings of the transcript text so they can be matched back to it programmatically. \
-        If you can't find the exact words, don't propose that candidate.
+        substrings of the transcript text so they can be matched back to it programmatically \
+        by exact word sequence. If you can't find the exact words, don't propose that \
+        candidate. Minor filler words ("um", "like", "you know") should be included if they \
+        fall inside the quoted span, since the match is done on literal substrings.
 
-        Scoring rubric, in rough order of reliability:
-        1. Disagreement -- two people landing on opposite sides. Self-explanatory in 3 \
-        seconds, doesn't need to know who anyone is. Highest comment rate.
-        2. Counterintuitive claim -- states the opposite of received wisdom, then justifies it.
-        3. Specific number/detail -- concrete beats vague every time.
-        4. Story with a turn -- compressed anecdote, setup -> complication -> resolution.
-        5. Practical answer -- direct, usable answer to a question people actually have.
-        6. Genuine reaction -- real laughter/surprise/discomfort, weakest alone since it \
-        needs context.
-        7. Vulnerability -- a surprising emotional/tonal shift; flag if sensitive subject matter.
+        Cut-point judgment (this is what quoteStart/quoteEnd should express, since these \
+        become the actual clip boundaries):
+        - Start later than instinct suggests. Most good moments are preceded by 3-5 seconds \
+        of throat-clearing ("yeah, no, I think, well, the thing about that is..."). \
+        quoteStart should be the first word that actually carries meaning, not the run-up.
+        - End on the landing, not after it. The point usually arrives, then the speaker \
+        keeps going for a few more seconds, softening it or adding a caveat. quoteEnd should \
+        be the words where the thought actually resolves -- a punchline, a period, a clear \
+        conclusion -- not the trailing hedge after it.
+        - Do not cut before a payoff to fake a cliffhanger. It reads as a broken clip, not \
+        suspense, and viewers bounce immediately.
 
-        The "stranger test" is the master filter: if someone who's never heard the episode \
-        would need one sentence of your explanation, it's not a clip. Skip moments that need \
-        prior context to land.
+        Scoring rubric, in rough order of reliability (highest-value types first). These are \
+        illustrative examples of what strong instances of each type sound like, not moments \
+        that necessarily appear in this specific transcript:
+        1. Disagreement -- two people landing on opposite sides of something. Self-explanatory \
+        in 3 seconds, doesn't need to know who anyone is. Highest comment rate of any type, \
+        because viewers want to pick a side. Example shape: "I actually think you're wrong \
+        about that -- here's why."
+        2. Counterintuitive claim -- states the opposite of received wisdom, then justifies \
+        it. Example shape: "Posting every day is the worst thing you can do for a new channel."
+        3. Specific number or concrete detail -- specificity beats vagueness every time. \
+        "We lost about eleven grand a month" travels further than "we were struggling \
+        financially" because a stranger can't fact-check vague claims but can react to a \
+        precise one.
+        4. Story with a turn -- a compressed anecdote with a setup, a complication, and a \
+        resolution. Worth a slightly longer clip (60-90s) since the narrative itself does the \
+        retention work.
+        5. Practical answer -- a direct, usable answer to a question a stranger genuinely has. \
+        Highest save/share rate of any type, since people bookmark it to use later.
+        6. Genuine reaction -- real laughter, surprise, or discomfort, big enough to read \
+        instantly on its own. Weakest type alone since it depends most on surrounding context, \
+        but strong when paired with what triggered it.
+        7. Vulnerability -- a surprising emotional or tonal shift, e.g. a brash speaker \
+        admitting doubt or fear. Flag if it touches sensitive subject matter (trauma, illness, \
+        legal jeopardy) so it can get extra editorial review before publishing.
 
-        Skip: intros, sponsor reads, sign-offs, anything referencing "earlier in the episode."
+        The "stranger test" is the master filter for every type above: if someone who has \
+        never heard this episode would need one sentence of your explanation to understand \
+        why the moment matters, it is not a clip. Skip moments that only make sense with \
+        context from elsewhere in the episode.
 
-        Skip content that is hate speech, harassment, or targets someone's identity/orientation \
-        as an insult -- score it low (under 40) even if it has shock value, since it carries real \
-        platform-policy risk and shouldn't be recommended for publishing.
+        Always skip: introductions, sponsor reads, sign-offs, "as I mentioned earlier" \
+        callbacks, and technical/audio troubleshooting chatter.
 
-        Return every genuine candidate you find in this window, even if there are many. A later \
-        pass will rank and filter across the whole episode -- your job here is recall, not the \
-        final cut.
+        Skip content that is hate speech, harassment, or targets someone's identity, \
+        orientation, or protected characteristics as an insult -- score it low (under 40) even \
+        if it has shock value, since it carries real platform-policy risk (strikes, demonetization) \
+        and should not be recommended for publishing regardless of how "viral" it might look.
+
+        Return every genuine candidate you find in this window, even if there are many -- do \
+        not artificially limit yourself to a small number. A later pass will rank and filter \
+        candidates across the whole episode together, so your only job here is high-recall \
+        discovery within this window, not making the final publishing decision.
         """
 }
