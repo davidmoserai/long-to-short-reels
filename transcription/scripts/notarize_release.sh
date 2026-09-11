@@ -6,7 +6,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-APP_BUNDLE="$ROOT/dist/Long to Short.app"
+APP_BUNDLE="$ROOT/dist/Armin's Long to Short Converter.app"
 ZIP_PATH="$ROOT/dist/LongToShort-notarize.zip"
 PROFILE="longtoshort-notary"
 

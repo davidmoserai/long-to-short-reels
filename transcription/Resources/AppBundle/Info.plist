@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>Long to Short</string>
+    <string>Armin's Long to Short Converter</string>
     <key>CFBundleDisplayName</key>
-    <string>Long to Short</string>
+    <string>Armin's Long to Short Converter</string>
     <key>CFBundleIdentifier</key>
     <string>com.davidmoser.longtoshort</string>
     <key>CFBundleVersion</key>

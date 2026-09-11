@@ -7,8 +7,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-APP_BUNDLE="$ROOT/dist/Long to Short.app"
-DMG_PATH="$ROOT/dist/Long to Short.dmg"
+APP_BUNDLE="$ROOT/dist/Armin's Long to Short Converter.app"
+DMG_PATH="$ROOT/dist/Armin's Long to Short Converter.dmg"
 STAGING="$ROOT/dist/dmg-staging"
 PROFILE="longtoshort-notary"
 
@@ -24,7 +24,7 @@ cp -R "$APP_BUNDLE" "$STAGING/"
 ln -s /Applications "$STAGING/Applications"
 
 echo "==> Creating DMG..."
-hdiutil create -volname "Long to Short" -srcfolder "$STAGING" -ov -format UDZO "$DMG_PATH"
+hdiutil create -volname "Armin's Long to Short Converter" -srcfolder "$STAGING" -ov -format UDZO "$DMG_PATH"
 rm -rf "$STAGING"
 
 echo "==> Signing the DMG..."

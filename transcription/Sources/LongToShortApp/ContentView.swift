@@ -18,8 +18,9 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            Text("Long to Short")
+            Text("Armin's Long to Short Converter")
                 .font(.largeTitle.bold())
+                .multilineTextAlignment(.center)
 
             switch state {
             case .idle:

@@ -10,7 +10,7 @@ cd "$ROOT"
 SIGNING_IDENTITY="Developer ID Application: David Moser (UBB9PBT3N5)"
 APP_NAME="LongToShortApp"
 DIST_DIR="$ROOT/dist"
-APP_BUNDLE="$DIST_DIR/Long to Short.app"
+APP_BUNDLE="$DIST_DIR/Armin's Long to Short Converter.app"
 
 echo "==> Building release binary..."
 swift build -c release --product "$APP_NAME"
