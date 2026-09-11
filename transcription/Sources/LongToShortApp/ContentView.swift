@@ -13,6 +13,7 @@ enum ProcessingState: Equatable {
 }
 
 struct ContentView: View {
+    @EnvironmentObject private var apiKeyStatus: APIKeyStatus
     @State private var state: ProcessingState = .idle
     @State private var isTargeted = false
 
@@ -65,7 +66,7 @@ struct ContentView: View {
             }
             .buttonStyle(.borderedProminent)
 
-            if KeychainStore.loadAPIKey() == nil {
+            if !apiKeyStatus.hasKey {
                 Label("Set your Anthropic API key in Settings before processing.", systemImage: "exclamationmark.triangle")
                     .font(.caption)
                     .foregroundStyle(.orange)

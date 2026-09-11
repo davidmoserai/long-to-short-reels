@@ -2,6 +2,7 @@ import SwiftUI
 import LongToShortCore
 
 struct SettingsView: View {
+    @EnvironmentObject private var apiKeyStatus: APIKeyStatus
     @State private var apiKey: String = ""
     @State private var saved = false
 
@@ -18,6 +19,7 @@ struct SettingsView: View {
             HStack {
                 Button("Save") {
                     KeychainStore.saveAPIKey(apiKey)
+                    apiKeyStatus.refresh()
                     saved = true
                 }
                 .disabled(apiKey.trimmingCharacters(in: .whitespaces).isEmpty)
