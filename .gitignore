@@ -1,0 +1,19 @@
+# Media (large binary files, not versioned)
+media/
+output/
+
+# Swift
+transcription/.build/
+transcription/.swiftpm/
+*.xcodeproj
+
+# Python
+pipeline/__pycache__/
+pipeline/.venv/
+*.pyc
+
+# macOS
+.DS_Store
+
+# Debug scratch (per-window transcript dumps from manual scoring pass)
+pipeline/window_texts/
