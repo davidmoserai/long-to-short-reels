@@ -30,11 +30,16 @@ rm -rf "$STAGING"
 echo "==> Signing the DMG..."
 codesign --force --sign "Developer ID Application: David Moser (UBB9PBT3N5)" "$DMG_PATH"
 
-echo "==> Notarizing the DMG..."
-xcrun notarytool submit "$DMG_PATH" --keychain-profile "$PROFILE" --wait
+if xcrun notarytool history --keychain-profile "$PROFILE" >/dev/null 2>&1; then
+    echo "==> Notarizing the DMG..."
+    xcrun notarytool submit "$DMG_PATH" --keychain-profile "$PROFILE" --wait
 
-echo "==> Stapling..."
-xcrun stapler staple "$DMG_PATH"
+    echo "==> Stapling..."
+    xcrun stapler staple "$DMG_PATH"
+else
+    echo "(No notarytool profile '$PROFILE' -- skipping DMG notarization.)"
+    echo "(First launch will need right-click -> Open instead of double-click.)"
+fi
 
 echo ""
 echo "Ready to send: $DMG_PATH"
