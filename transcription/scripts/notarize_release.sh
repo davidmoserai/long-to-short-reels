@@ -19,13 +19,14 @@ fi
 if ! xcrun notarytool history --keychain-profile "$PROFILE" >/dev/null 2>&1; then
     echo "No notarytool credential profile named '$PROFILE' found."
     echo ""
-    echo "One-time setup, run this yourself (needs an App Store Connect API key"
-    echo "from https://appstoreconnect.apple.com/access/integrations/api):"
+    echo "One-time setup -- run this yourself, it will interactively prompt you"
+    echo "for your Apple ID, Team ID, and an app-specific password (generate one"
+    echo "at https://account.apple.com -> Sign-In and Security -> App-Specific"
+    echo "Passwords -- nothing to do with App Store Connect or publishing):"
     echo ""
-    echo "  xcrun notarytool store-credentials \"$PROFILE\" \\"
-    echo "    --key /path/to/AuthKey_XXXXXXXXXX.p8 \\"
-    echo "    --key-id XXXXXXXXXX \\"
-    echo "    --issuer YOUR-ISSUER-ID-UUID"
+    echo "  xcrun notarytool store-credentials \"$PROFILE\""
+    echo ""
+    echo "Team ID is UBB9PBT3N5 (from your Developer ID Application certificate)."
     echo ""
     exit 1
 fi
