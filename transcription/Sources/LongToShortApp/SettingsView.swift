@@ -8,13 +8,11 @@ struct SettingsView: View {
     var body: some View {
         Form {
             Section {
-                SecureField("Anthropic API key", text: $apiKey)
+                SecureField("sk-ant-...", text: $apiKey)
                     .textFieldStyle(.roundedBorder)
                 Text("Get your own key at [console.anthropic.com](https://console.anthropic.com) — stored only in your Mac's Keychain, never sent anywhere except Anthropic's API.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-            } header: {
-                Text("API Key")
             }
 
             HStack {
