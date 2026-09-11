@@ -21,6 +21,7 @@ mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources"
 
 cp ".build/release/$APP_NAME" "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
 cp "Resources/AppBundle/Info.plist" "$APP_BUNDLE/Contents/Info.plist"
+cp "Resources/Branding/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/AppIcon.icns"
 
 # Copy any SPM resource bundles (e.g. FluidAudio's model config bundle) so
 # Bundle.module resolution still works once wrapped in a proper .app.

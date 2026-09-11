@@ -1,0 +1,40 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#232329"/>
+      <stop offset="100%" stop-color="#0B0B0E"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="20%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A59"/>
+      <stop offset="100%" stop-color="#C23B8F"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="72%" cy="78%" r="55%">
+      <stop offset="0%" stop-color="#FF7A59" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#FF7A59" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- squircle background -->
+  <rect x="0" y="0" width="1024" height="1024" rx="228" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1024" height="1024" rx="228" fill="url(#glow)"/>
+
+  <!-- long (landscape) source clip -- muted, the "before" -->
+  <g opacity="0.5">
+    <rect x="148" y="268" width="516" height="284" rx="34" fill="none" stroke="#9A9AA2" stroke-width="22"/>
+    <path d="M 366 356 L 366 412 L 414 384 Z" fill="#9A9AA2"/>
+  </g>
+
+  <!-- transform arrow: long becomes short -->
+  <path
+    d="M 604 486 C 690 542, 726 580, 742 632"
+    fill="none" stroke="#F2F2F4" stroke-width="20" stroke-linecap="round" opacity="0.92"
+  />
+  <path
+    d="M 712 610 L 746 636 L 706 656"
+    fill="none" stroke="#F2F2F4" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"
+  />
+
+  <!-- short (vertical reel) output clip -- vivid, the "after" -->
+  <rect x="606" y="546" width="270" height="418" rx="46" fill="url(#accent)"/>
+  <path d="M 710 692 L 710 782 L 786 737 Z" fill="#FFFFFF"/>
+</svg>
