@@ -18,3 +18,14 @@ pipeline/.venv/
 # Debug scratch (per-window transcript dumps from manual scoring pass)
 pipeline/window_texts/
 transcription/dist/
+
+# Credentials -- must never be committed (keys live in Keychain/env only)
+*.p8
+*.p12
+*.pfx
+*.pem
+*.key
+gcp-oauth.keys.json
+tokens.json
+.env
+.env.*
