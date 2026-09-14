@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>Armin's Long to Short Converter updates</title>
+    <item>
+      <title>Version 1.0.2</title>
+      <sparkle:version>202609141014</sparkle:version>
+      <sparkle:shortVersionString>1.0.2</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0.0</sparkle:minimumSystemVersion>
+      <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+      <pubDate>Mon, 14 Sep 2026 08:15:39 +0000</pubDate>
+      <enclosure url="https://github.com/davidmoserai/long-to-short-reels/releases/download/v1.0.2/Armins-Long-to-Short-Converter.dmg" sparkle:edSignature="ABkpLAWR4N86/a3VBtm10hnauPLHI2wnCC6v4T0HxYG4SnMTAcDiSuuZ8r8r8zBOfx68PEV+iYmdGyFMSTbeAg==" length="11727747" type="application/octet-stream" />
+    </item>
+  </channel>
+</rss>
