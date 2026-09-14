@@ -15,8 +15,15 @@ public enum ClaudeScorer {
     private static let endpoint = URL(string: "https://api.anthropic.com/v1/messages")!
     private static let anthropicVersion = "2023-06-01"
 
-    public struct ScoringError: Error, CustomStringConvertible {
+    public struct ScoringError: LocalizedError, CustomStringConvertible {
         public let description: String
+
+        public var errorDescription: String? { description }
+    }
+
+    private struct ScoredWindow: Sendable {
+        let id: Int
+        let candidates: [RawCandidate]
     }
 
     /// Score every window, with bounded concurrency. The cached system
@@ -27,31 +34,40 @@ public enum ClaudeScorer {
         apiKey: String,
         model: String = defaultModel,
         maxConcurrent: Int = 4,
-        onProgress: (@Sendable (Int, Int) -> Void)? = nil
+        cachedResults: [Int: [RawCandidate]] = [:],
+        onProgress: (@Sendable (Int, Int) -> Void)? = nil,
+        onWindowScored: (@Sendable (Int, [RawCandidate]) -> Void)? = nil
     ) async throws -> [RawCandidate] {
-        var results: [RawCandidate] = []
-        var completed = 0
+        var results = cachedResults.values.flatMap { $0 }
+        var completed = cachedResults.count
+        let remainingWindows = windows.filter { cachedResults[$0.windowId] == nil }
 
-        try await withThrowingTaskGroup(of: [RawCandidate].self) { group in
-            var iterator = windows.makeIterator()
+        onProgress?(completed, windows.count)
+
+        try await withThrowingTaskGroup(of: ScoredWindow.self) { group in
+            var iterator = remainingWindows.makeIterator()
             var inFlight = 0
 
             func addNext() {
                 guard let window = iterator.next() else { return }
                 inFlight += 1
                 group.addTask {
-                    try await scoreWindow(window, apiKey: apiKey, model: model)
+                    ScoredWindow(
+                        id: window.windowId,
+                        candidates: try await scoreWindow(window, apiKey: apiKey, model: model)
+                    )
                 }
             }
 
             for _ in 0..<maxConcurrent { addNext() }
 
             while inFlight > 0 {
-                if let candidates = try await group.next() {
+                if let scored = try await group.next() {
                     inFlight -= 1
                     completed += 1
                     onProgress?(completed, windows.count)
-                    results.append(contentsOf: candidates)
+                    onWindowScored?(scored.id, scored.candidates)
+                    results.append(contentsOf: scored.candidates)
                     addNext()
                 }
             }
@@ -102,8 +118,9 @@ public enum ClaudeScorer {
             throw ScoringError(description: "No HTTP response")
         }
         guard http.statusCode == 200 else {
-            let bodyText = String(data: data, encoding: .utf8) ?? "<unreadable>"
-            throw ScoringError(description: "HTTP \(http.statusCode): \(bodyText)")
+            let bodyText = String(data: data, encoding: .utf8) ?? "<unreadable response>"
+            let message = (try? JSONDecoder().decode(AnthropicErrorResponse.self, from: data))?.error.message
+            throw ScoringError(description: "Anthropic request failed (\(http.statusCode)): \(message ?? bodyText)")
         }
 
         let envelope = try JSONDecoder().decode(AnthropicResponse.self, from: data)
@@ -138,6 +155,14 @@ public enum ClaudeScorer {
         let content: [ContentBlock]
         let stop_reason: String?
         let usage: Usage?
+    }
+
+    private struct AnthropicErrorResponse: Decodable {
+        struct ErrorBody: Decodable {
+            let message: String
+        }
+
+        let error: ErrorBody
     }
 
     private struct CandidatesResponse: Decodable {

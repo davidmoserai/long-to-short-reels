@@ -34,5 +34,9 @@ let package = Package(
                 "LongToShortCore"
             ]
         ),
+        .testTarget(
+            name: "LongToShortCoreTests",
+            dependencies: ["LongToShortCore"]
+        ),
     ]
 )

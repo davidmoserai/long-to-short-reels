@@ -28,15 +28,24 @@ public enum ClipCutter {
             duration: CMTime(seconds: duration, preferredTimescale: 600)
         )
 
-        if FileManager.default.fileExists(atPath: output.path) {
-            try FileManager.default.removeItem(at: output)
-        }
+        let temporaryOutput = output.deletingLastPathComponent()
+            .appendingPathComponent(".\(UUID().uuidString).mp4")
 
         do {
-            try await exportSession.export(to: output, as: .mp4)
+            try await exportSession.export(to: temporaryOutput, as: .mp4)
+            if FileManager.default.fileExists(atPath: output.path) {
+                try FileManager.default.removeItem(at: output)
+            }
+            try FileManager.default.moveItem(at: temporaryOutput, to: output)
         } catch {
+            try? FileManager.default.removeItem(at: temporaryOutput)
             throw CutError(description: "Export failed for \(output.lastPathComponent): \(error.localizedDescription)")
         }
+    }
+
+    public static func outputDirectory(for source: URL) -> URL {
+        let baseName = source.deletingPathExtension().lastPathComponent
+        return source.deletingLastPathComponent().appendingPathComponent("\(baseName)_clips")
     }
 
     /// Cuts every highlight, writing into a subfolder named after the source file.
@@ -45,14 +54,15 @@ public enum ClipCutter {
         _ highlights: [Highlight], source: URL,
         onProgress: (@Sendable (Int, Int) -> Void)? = nil
     ) async throws -> URL {
-        let baseName = source.deletingPathExtension().lastPathComponent
-        let outputDir = source.deletingLastPathComponent().appendingPathComponent("\(baseName)_clips")
+        let outputDir = outputDirectory(for: source)
         try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
 
         for (i, h) in highlights.enumerated() {
             let filename = "\(String(format: "%02d", i + 1))_\(h.id)_\(h.momentType.rawValue)_score\(h.score).mp4"
             let outputPath = outputDir.appendingPathComponent(filename)
-            try await cutClip(source: source, start: h.start, end: h.end, output: outputPath)
+            if !FileManager.default.fileExists(atPath: outputPath.path) {
+                try await cutClip(source: source, start: h.start, end: h.end, output: outputPath)
+            }
             onProgress?(i + 1, highlights.count)
         }
 

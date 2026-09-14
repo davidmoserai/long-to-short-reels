@@ -23,10 +23,11 @@ struct LongToShortApp: App {
                     APIKeyOnboardingView()
                 }
             }
-            .frame(minWidth: 520, minHeight: 420)
+            .frame(minWidth: 960, minHeight: 640)
             .environmentObject(apiKeyStatus)
         }
-        .windowResizability(.contentSize)
+        .defaultSize(width: 1200, height: 800)
+        .windowResizability(.automatic)
 
         Settings {
             SettingsView()

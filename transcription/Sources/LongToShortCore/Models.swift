@@ -95,7 +95,7 @@ public struct ResolvedCandidate: Sendable {
 }
 
 /// A final, selected highlight ready to be cut.
-public struct Highlight: Sendable {
+public struct Highlight: Codable, Sendable {
     public let id: String
     public let momentType: MomentType
     public let score: Int

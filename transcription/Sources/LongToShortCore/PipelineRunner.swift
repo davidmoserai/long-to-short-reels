@@ -12,36 +12,67 @@ public enum PipelineRunner {
         case failed(String)
     }
 
-    public struct Result: Sendable {
+    public struct PreparedResult: Sendable {
         public let transcript: Transcript
         public let highlights: [Highlight]
-        public let outputDir: URL
+        public let sourceURL: URL
     }
 
-    public static func run(
+    public static func prepare(
         inputPath: String,
         apiKey: String,
         onStage: @escaping @Sendable (Stage) -> Void
-    ) async throws -> Result {
+    ) async throws -> PreparedResult {
         let sourceURL = URL(fileURLWithPath: inputPath)
 
-        onStage(.transcribing("Starting..."))
-        let transcript = try await Transcriber.transcribe(inputPath: inputPath) { status in
-            onStage(.transcribing(status))
+        let checkpoint: PipelineCheckpoint
+        let transcript: Transcript
+        if let saved = PipelineCheckpointStore.load(for: sourceURL) {
+            checkpoint = saved
+            transcript = saved.transcript
+            onStage(.transcribing("Using saved transcript and previous progress..."))
+        } else {
+            onStage(.transcribing("Starting..."))
+            transcript = try await Transcriber.transcribe(inputPath: inputPath) { status in
+                onStage(.transcribing(status))
+            }
+            checkpoint = try PipelineCheckpointStore.create(transcript: transcript, source: sourceURL)
+            try PipelineCheckpointStore.save(checkpoint, for: sourceURL)
         }
+        let checkpointWriter = PipelineCheckpointWriter(checkpoint: checkpoint, source: sourceURL)
 
         let windows = Windower.buildWindows(for: transcript)
+        let cachedScores = checkpointWriter.cachedScores(for: ClaudeScorer.defaultModel)
 
-        onStage(.scoring(completed: 0, total: windows.count))
-        let rawCandidates = try await ClaudeScorer.scoreAllWindows(
-            windows, apiKey: apiKey
-        ) { completed, total in
-            onStage(.scoring(completed: completed, total: total))
+        let rawCandidates: [RawCandidate]
+        if windows.allSatisfy({ cachedScores[$0.windowId] != nil }) {
+            onStage(.scoring(completed: windows.count, total: windows.count))
+            rawCandidates = cachedScores.values.flatMap { $0 }
+        } else {
+            onStage(.scoring(completed: cachedScores.count, total: windows.count))
+            rawCandidates = try await ClaudeScorer.scoreAllWindows(
+                windows,
+                apiKey: apiKey,
+                cachedResults: cachedScores,
+                onProgress: { completed, total in
+                    onStage(.scoring(completed: completed, total: total))
+                },
+                onWindowScored: { windowID, candidates in
+                    checkpointWriter.recordScores(candidates, for: windowID)
+                }
+            )
         }
 
-        onStage(.selecting)
-        let resolved = TimestampResolver.resolve(rawCandidates, transcript: transcript)
-        let highlights = HighlightSelector.select(from: resolved, words: transcript.words)
+        let highlights: [Highlight]
+        if let savedHighlights = checkpointWriter.cachedHighlights(for: ClaudeScorer.defaultModel) {
+            highlights = savedHighlights
+            onStage(.selecting)
+        } else {
+            onStage(.selecting)
+            let resolved = TimestampResolver.resolve(rawCandidates, transcript: transcript)
+            highlights = HighlightSelector.select(from: resolved, words: transcript.words)
+            checkpointWriter.recordHighlights(highlights)
+        }
 
         guard !highlights.isEmpty else {
             throw NSError(
@@ -49,6 +80,14 @@ public enum PipelineRunner {
                 userInfo: [NSLocalizedDescriptionKey: "No highlight-worthy moments found in \(sourceURL.lastPathComponent)"])
         }
 
+        return PreparedResult(transcript: transcript, highlights: highlights, sourceURL: sourceURL)
+    }
+
+    public static func export(
+        _ highlights: [Highlight],
+        sourceURL: URL,
+        onStage: @escaping @Sendable (Stage) -> Void
+    ) async throws -> URL {
         onStage(.cutting(completed: 0, total: highlights.count))
         let outputDir = try await ClipCutter.cutAll(highlights, source: sourceURL) {
             completed, total in
@@ -57,6 +96,6 @@ public enum PipelineRunner {
 
         onStage(.done(clipCount: highlights.count, outputDir: outputDir))
 
-        return Result(transcript: transcript, highlights: highlights, outputDir: outputDir)
+        return outputDir
     }
 }
