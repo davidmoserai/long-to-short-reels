@@ -6,9 +6,15 @@ struct LongToShortApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .frame(minWidth: 520, minHeight: 420)
-                .environmentObject(apiKeyStatus)
+            Group {
+                if apiKeyStatus.hasKey {
+                    ContentView()
+                } else {
+                    APIKeyOnboardingView()
+                }
+            }
+            .frame(minWidth: 520, minHeight: 420)
+            .environmentObject(apiKeyStatus)
         }
         .windowResizability(.contentSize)
 

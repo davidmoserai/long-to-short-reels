@@ -66,11 +66,6 @@ struct ContentView: View {
             }
             .buttonStyle(.borderedProminent)
 
-            if !apiKeyStatus.hasKey {
-                Label("Set your Anthropic API key in Settings before processing.", systemImage: "exclamationmark.triangle")
-                    .font(.caption)
-                    .foregroundStyle(.orange)
-            }
         }
     }
 
@@ -188,7 +183,7 @@ struct ContentView: View {
     private func processVideos(_ urls: [URL]) {
         guard !urls.isEmpty else { return }
         guard let apiKey = KeychainStore.loadAPIKey() else {
-            state = .error("No Anthropic API key set. Open Settings and add your key first.")
+            apiKeyStatus.refresh()
             return
         }
 
