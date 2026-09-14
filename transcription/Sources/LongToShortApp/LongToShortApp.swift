@@ -1,8 +1,18 @@
 import SwiftUI
+import Sparkle
 
 @main
 struct LongToShortApp: App {
     @StateObject private var apiKeyStatus = APIKeyStatus()
+    private let updaterController: SPUStandardUpdaterController
+
+    init() {
+        updaterController = SPUStandardUpdaterController(
+            startingUpdater: true,
+            updaterDelegate: nil,
+            userDriverDelegate: nil
+        )
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -22,6 +32,14 @@ struct LongToShortApp: App {
             SettingsView()
                 .frame(width: 420)
                 .environmentObject(apiKeyStatus)
+        }
+
+        .commands {
+            CommandGroup(after: .appInfo) {
+                Button("Check for Updates…") {
+                    updaterController.checkForUpdates(nil)
+                }
+            }
         }
     }
 }

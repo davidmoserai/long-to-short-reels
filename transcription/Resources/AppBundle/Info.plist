@@ -11,7 +11,7 @@
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0.1</string>
+    <string>1.0.2</string>
     <key>CFBundleExecutable</key>
     <string>LongToShortApp</string>
     <key>CFBundleIconFile</key>
@@ -22,6 +22,16 @@
     <string>6.0</string>
     <key>LSMinimumSystemVersion</key>
     <string>26.0</string>
+    <key>SUFeedURL</key>
+    <string>https://raw.githubusercontent.com/davidmoserai/long-to-short-reels/master/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>BMfSelU9nZxKFpy8Ep7NIdtgAvsyZtyzbYkR28ocYx4=</string>
+    <key>SUEnableAutomaticChecks</key>
+    <true/>
+    <key>SUAutomaticallyUpdate</key>
+    <true/>
+    <key>SUVerifyUpdateBeforeExtraction</key>
+    <true/>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.video</string>
     <key>NSHumanReadableCopyright</key>

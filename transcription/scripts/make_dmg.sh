@@ -8,7 +8,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 APP_BUNDLE="$ROOT/dist/Armin's Long to Short Converter.app"
-DMG_PATH="$ROOT/dist/Armin's Long to Short Converter.dmg"
+DMG_PATH="$ROOT/dist/Armins-Long-to-Short-Converter.dmg"
 STAGING="$ROOT/dist/dmg-staging"
 PROFILE="longtoshort-notary"
 

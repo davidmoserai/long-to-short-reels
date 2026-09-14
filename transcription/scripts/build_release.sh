@@ -11,17 +11,27 @@ SIGNING_IDENTITY="Developer ID Application: David Moser (UBB9PBT3N5)"
 APP_NAME="LongToShortApp"
 DIST_DIR="$ROOT/dist"
 APP_BUNDLE="$DIST_DIR/Armin's Long to Short Converter.app"
+SPARKLE_FRAMEWORK="$ROOT/.build/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework"
 
 echo "==> Building release binary..."
 swift build -c release --product "$APP_NAME"
 
 echo "==> Assembling app bundle..."
 rm -rf "$APP_BUNDLE"
-mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources"
+mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources" "$APP_BUNDLE/Contents/Frameworks"
 
 cp ".build/release/$APP_NAME" "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
 cp "Resources/AppBundle/Info.plist" "$APP_BUNDLE/Contents/Info.plist"
 cp "Resources/Branding/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/AppIcon.icns"
+
+# SwiftPM links binary frameworks through @rpath; packaged apps load them here.
+install_name_tool -add_rpath "@loader_path/../Frameworks" "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
+
+if [ ! -d "$SPARKLE_FRAMEWORK" ]; then
+    echo "Sparkle.framework is missing. Run swift package resolve first."
+    exit 1
+fi
+cp -R "$SPARKLE_FRAMEWORK" "$APP_BUNDLE/Contents/Frameworks/"
 
 # Stamp a fresh build number every release so Finder/Dock/Stage Manager
 # drop their cached bundle icon instead of reusing a stale generic one.

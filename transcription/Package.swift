@@ -5,7 +5,8 @@ let package = Package(
     name: "transcribe",
     platforms: [.macOS(.v26)],
     dependencies: [
-        .package(url: "https://github.com/FluidInference/FluidAudio.git", from: "0.12.4")
+        .package(url: "https://github.com/FluidInference/FluidAudio.git", from: "0.12.4"),
+        .package(url: "https://github.com/sparkle-project/Sparkle.git", from: "2.10.0"),
     ],
     targets: [
         .executableTarget(
@@ -23,7 +24,8 @@ let package = Package(
         .executableTarget(
             name: "LongToShortApp",
             dependencies: [
-                "LongToShortCore"
+                "LongToShortCore",
+                .product(name: "Sparkle", package: "Sparkle")
             ]
         ),
         .executableTarget(
